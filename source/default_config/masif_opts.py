@@ -2,6 +2,7 @@ import tempfile
 
 masif_opts = {}
 # Default directories
+masif_opts["in_pdb_dir"] = "in_pdbs/"
 masif_opts["raw_pdb_dir"] = "data_preparation/00-raw_pdbs/"
 masif_opts["pdb_chain_dir"] = "data_preparation/01-benchmark_pdbs/"
 masif_opts["ply_chain_dir"] = "data_preparation/01-benchmark_surfaces/"
