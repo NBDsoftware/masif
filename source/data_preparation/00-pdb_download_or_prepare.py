@@ -32,16 +32,14 @@ pdb_id = in_fields[0]
 pdb_in_file = masif_opts['in_pdb_dir']+pdb_id+".pdb"
 if not os.path.exists(pdb_in_file):
     # Download pdb
-    print ("DOWNLOAD PDB", pdb_id)
+    print ("Download pdb", pdb_id)
     pdbl = PDBList(server='http://ftp.wwpdb.org')
     pdb_filename = pdbl.retrieve_pdb_file(pdb_id, pdir=masif_opts['tmp_dir'],file_format='pdb')
 else:
-    print("MOVE PDB", pdb_id)
+    print("Copy pdb", pdb_id)
     pdb_filename = masif_opts['tmp_dir']+"/"+pdb_id+".pdb"
     shutil.move(pdb_in_file, pdb_filename)
 
-print ("FILENAME: ", pdb_filename)
-print ("IN_NAME:", pdb_in_file)
 
 ##### Protonate with reduce, if hydrogens included.
 # - Always protonate as this is useful for charges. If necessary ignore hydrogens later.
