@@ -29,7 +29,7 @@ if not os.path.exists(masif_opts['tmp_dir']):
 in_fields = sys.argv[1].split('_')
 pdb_id = in_fields[0]
 
-pdb_in_file = masif_opts['in_pdb_dir']+"/"+pdb_id+".pdb"
+pdb_in_file = masif_opts['in_pdb_dir']+pdb_id+".pdb"
 if not os.path.exists(pdb_in_file):
     # Download pdb
     print ("DOWNLOAD PDB", pdb_id)
