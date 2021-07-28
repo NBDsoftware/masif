@@ -88,8 +88,7 @@ Released under an Apache License 2.0
 """
 
 
-masif_data = os.environ["masif_data"]
-top_dir = os.path.join(masif_data, "/")
+top_dir = os.environ["masif_data"]
 surf_dir = os.path.join(top_dir, masif_opts["ply_chain_dir"])
 iface_dir = os.path.join(
     top_dir, masif_opts["site"]["out_pred_dir"]
