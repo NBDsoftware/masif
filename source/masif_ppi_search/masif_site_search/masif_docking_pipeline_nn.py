@@ -48,6 +48,8 @@ amount of shape complementarity
 target_name = sys.argv[1]
 target_ppi_pair_id = sys.argv[2]
 
+print ("TARGET_NAME:", target_name)
+
 # Save the chains as separate files.
 in_fields = target_name.split("_")
 target_pdb_id = in_fields[0]
