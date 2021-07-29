@@ -62,7 +62,7 @@ Descriptor cutoff: This is the key parameter for the speed of the method. The lo
 the faster the method, but also the higher the number of false negatives. Values ABOVE
 this cutoff are discareded. Recommended values: 1.7-2.2. 
 """
-DESC_DIST_CUTOFF=1.7
+DESC_DIST_CUTOFF=2.5
 
 """
 Iface cutoff: Patches are also filtered by their MaSIF-site score. Patches whose center
@@ -138,7 +138,7 @@ out_patch.close()
 
 # Match descriptors that have a descriptor distance less than K
 def match_descriptors(
-    in_desc_dir, in_iface_dir, pids, target_desc, desc_dist_cutoff=2.2, iface_cutoff=0.8, receptor_name
+    in_desc_dir, in_iface_dir, pids, target_desc, receptor_name, desc_dist_cutoff=2.2, iface_cutoff=0.8
 ):
 
     all_matched_names = []
@@ -146,32 +146,43 @@ def match_descriptors(
     all_matched_desc_dist = []
     count_proteins = 0
     mydescdir = os.path.join(in_desc_dir, receptor_name)
+    print ("MYDESCDIR", mydescdir)
     for pid in pids:
         try:
-            fields = ppi_pair_id.split("_")
+            fields = receptor_name.split("_")
             if pid == "p1":
                 pdb_chain_id = fields[0] + "_" + fields[1]
             elif pid == "p2":
                 pdb_chain_id = fields[0] + "_" + fields[2]
+
             iface = np.load(in_iface_dir + "/pred_" + pdb_chain_id + ".npy")[0]
             descs = np.load(mydescdir + "/" + pid + "_desc_straight.npy")
+
+            print ("PDB_CHAIN_ID", pdb_chain_id)
+            print ("iface", in_iface_dir + "/pred_" + pdb_chain_id + ".npy", iface)
+            print ("descs", mydescdir + "/" + pid + "_desc_straight.npy", descs)
         except:
+            print ("EXCEPTION")
             continue
         print(pdb_chain_id)
-        name = (ppi_pair_id, pid)
+        name = (receptor_name, pid)
         count_proteins += 1
 
         diff = np.sqrt(np.sum(np.square(descs - target_desc), axis=1))
+        print ("DIFF", diff)
 
         true_iface = np.where(iface > iface_cutoff)[0]
         near_points = np.where(diff < desc_dist_cutoff)[0]
+        print ("true_iface", true_iface)
+        print ("near_points", near_points)
 
         selected = np.intersect1d(true_iface, near_points)
+        print ("SELECTED", selected)
         if len(selected > 0):
             all_matched_names.append([name] * len(selected))
             all_matched_vix.append(selected)
             all_matched_desc_dist.append(diff[selected])
-            print("Matched {}".format(ppi_pair_id))
+            print("Matched {}".format(receptor_name))
             print("Scores: {} {}".format(iface[selected], diff[selected]))
 
     print("Iterated over {} proteins.".format(count_proteins))
@@ -223,9 +234,8 @@ inlier_scores = []
 inlier_pos = []
 
 (matched_names, matched_vix, matched_desc_dist, count_proteins) = match_descriptors(
-    desc_dir, iface_dir, ["p1", "p2"], target_desc[target_vix],
-    desc_dist_cutoff=DESC_DIST_CUTOFF, iface_cutoff=IFACE_CUTOFF,
-    receptor_name
+    desc_dir, iface_dir, ["p1", "p2"], target_desc[target_vix], receptor_name,
+    desc_dist_cutoff=DESC_DIST_CUTOFF, iface_cutoff=IFACE_CUTOFF
 )
 
 matched_names = np.concatenate(matched_names, axis=0)
