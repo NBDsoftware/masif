@@ -70,7 +70,7 @@ point has a value BELOW this score are discarded.
 The higher the value faster the method, but also the higher the number of false negatives. 
 Recommended values: 0.8
 """
-IFACE_CUTOFF=0.8
+IFACE_CUTOFF=0.6
 
 def blockPrint():
     sys.stdout = open(os.devnull, "w")
@@ -305,8 +305,8 @@ for name in matched_dict.keys():
     scores = np.asarray(all_source_scores)
     desc_scores.append(scores)
 
-    # Filter anything above 9 .
-    top_scorers = np.where(scores > 0.9)[0]
+    # Filter anything above 8 .
+    top_scorers = np.where(scores > 0.8)[0]
 
     if len(top_scorers) > 0:
 
