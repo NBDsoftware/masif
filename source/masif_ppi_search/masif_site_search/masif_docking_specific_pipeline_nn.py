@@ -61,7 +61,7 @@ Descriptor cutoff: This is the key parameter for the speed of the method. The lo
 the faster the method, but also the higher the number of false negatives. Values ABOVE
 this cutoff are discareded. Recommended values: 1.7-2.2. 
 """
-DESC_DIST_CUTOFF=2.2
+DESC_DIST_CUTOFF=2.5
 
 """
 Iface cutoff: Patches are also filtered by their MaSIF-site score. Patches whose center
@@ -69,7 +69,7 @@ point has a value BELOW this score are discarded.
 The higher the value faster the method, but also the higher the number of false negatives. 
 Recommended values: 0.8
 """
-IFACE_CUTOFF=0.6
+IFACE_CUTOFF=0.4
 
 def blockPrint():
     sys.stdout = open(os.devnull, "w")
@@ -304,8 +304,10 @@ for name in matched_dict.keys():
     scores = np.asarray(all_source_scores)
     desc_scores.append(scores)
 
-    # Filter anything above 8 .
-    top_scorers = np.where(scores > 0.8)[0]
+    # Filter anything above 2 .
+    top_scorers = np.where(scores > 0.2)[0]
+    print ("SCORES", scores)
+    print ("TOP SCORES", top_scorers)
 
     if len(top_scorers) > 0:
 
