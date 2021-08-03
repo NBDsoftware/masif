@@ -27,7 +27,8 @@ from alignment_utils_masif_search import get_patch_geo, multidock, \
 from transformation_training_data.score_nn import ScoreNN
 
 """
-Script based on /masif/source/masif_ppi_search/pdl1_benchmark/pdl1_benchmark_nn.py
+Script based on /masif/source/masif_ppi_search/pdl1_benchmark/pdl1_benchmark_nn.py and
+/masif/source/masif_ppi_search/second_stage_alignment_nn.py
 Hard-coded configuration, change accordingly!"
 """
 
@@ -40,12 +41,10 @@ if len(sys.argv) <= 3:
     sys.exit(1)
 
 """
-Target name - hard coded and tested with PD-L1 (PDB id: 4ZQK). You can change you your own target and test. 
+Target name.
 In general this will work well with targets where MaSIF-site labels the site well and where there is a high
 amount of shape complementarity
 """
-#target_name = "4ZQK_A"
-#target_ppi_pair_id = "4ZQK_A_B"
 target_name = sys.argv[1]
 target_ppi_pair_id = sys.argv[2]
 receptor_name = sys.argv[3]
@@ -62,7 +61,7 @@ Descriptor cutoff: This is the key parameter for the speed of the method. The lo
 the faster the method, but also the higher the number of false negatives. Values ABOVE
 this cutoff are discareded. Recommended values: 1.7-2.2. 
 """
-DESC_DIST_CUTOFF=2.5
+DESC_DIST_CUTOFF=2.2
 
 """
 Iface cutoff: Patches are also filtered by their MaSIF-site score. Patches whose center
@@ -80,7 +79,7 @@ def enablePrint():
     sys.stdout = sys.__stdout__
     sys.stderr = sys.__stderr__
 
-
+# Read the pre-trained neural network.
 nn_model = ScoreNN()
 start_time = time.time()
 
@@ -110,8 +109,6 @@ precomp_dir = os.path.join(
 
 
 
-
-
 # Go through every 9A patch in top_dir -- get the one with the highest iface mean 12A around it.
 target_ply_fn = os.path.join(ply_iface_dir, target_name + ".ply")
 
@@ -119,7 +116,9 @@ mesh = pymesh.load_mesh(target_ply_fn)
 
 iface = mesh.get_attribute("vertex_iface")
 
+# Read the geodesic coordinates in an easy to access format.
 target_coord = subsample_patch_coords(target_ppi_pair_id, "p1", precomp_dir)
+# Get center of the patch on the target surface that has the highest mean iface score.
 target_vix = get_target_vix(target_coord, iface)
 
 target_pcd = read_point_cloud(target_ply_fn)
