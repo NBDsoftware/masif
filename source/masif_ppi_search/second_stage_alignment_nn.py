@@ -118,6 +118,7 @@ for i, pdb in enumerate(rand_list):
 
     # Read patch coordinates. 
 
+    # subsample_patch_coords: Read the geodesic coordinates in an easy to access format.
     pc = subsample_patch_coords(pdb, "p2", precomp_dir_9A)
     p2_patch_coords.append(pc)
 
@@ -195,6 +196,7 @@ for target_ix, target_pdb in enumerate(rand_list):
     target_coord = subsample_patch_coords(target_pdb, "p1", precomp_dir_9A, [center_point])
 
     # Get the geodesic patch and descriptor patch for the target.
+    # Get a patch based on geodesic distances.
     target_patch, target_patch_descs = get_patch_geo(
         target_pcd, target_coord, center_point, target_desc, flip=True
     )
