@@ -304,8 +304,7 @@ for name in matched_dict.keys():
     scores = np.asarray(all_source_scores)
     desc_scores.append(scores)
 
-    # Filter anything above 2 .
-    top_scorers = np.where(scores > 0.2)[0]
+    top_scorers = np.where(scores >= 0)[0]
     print ("SCORES", scores)
     print ("TOP SCORES", top_scorers)
 
