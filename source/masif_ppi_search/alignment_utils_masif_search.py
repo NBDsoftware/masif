@@ -258,6 +258,80 @@ def test_alignments(
     )  # , structure, structure_coord_pcd
 
 
+def test_alignments_save(
+    out_fn,  # The pdb path
+    transformation, # the 4D transformation matrix
+    random_transformation, # The random transformation matrix used before.
+    source_structure, # The source (decoy) binder structure in a Biopython object
+    target_ca_pcd_tree, # The target c-alphas in an Open3D point cloud tree format.
+    target_pcd_tree, # The target atoms in an Open 3D point cloud tree format.
+    radius=2.0, # The radius for clashes (unused)
+    interface_dist=10.0, # The interface cutoff to define the interface.
+):
+    """
+    Verify the alignment against the ground truth.
+    """
+
+    structure_coords = np.array(
+        [
+            atom.get_coord()
+            for atom in source_structure.get_atoms()
+            if atom.get_id() == "CA"
+        ]
+    )
+    structure_coord_pcd = PointCloud()
+    structure_coord_pcd.points = Vector3dVector(structure_coords)
+    structure_coord_pcd_notTransformed = copy.deepcopy(structure_coord_pcd)
+    structure_coord_pcd.transform(random_transformation)
+    structure_coord_pcd.transform(transformation)
+
+    clashing = 0
+    # Compute clashes (unused now)
+    for point in structure_coord_pcd.points:
+        [k, idx, _] = target_pcd_tree.search_radius_vector_3d(point, radius)
+        if k > 0:
+            clashing += 1
+
+    interface_atoms = []
+    # Compute structures.
+    for i, point in enumerate(structure_coords):
+        [k, idx, _] = target_ca_pcd_tree.search_radius_vector_3d(point, interface_dist)
+        if k > 0:
+            interface_atoms.append(i)
+    rmsd = np.sqrt(
+        np.mean(
+            np.square(
+                np.linalg.norm(
+                    structure_coords[interface_atoms, :]
+                    - np.asarray(structure_coord_pcd.points)[interface_atoms, :],
+                    axis=1,
+                )
+            )
+        )
+    )
+    structure_coords_full = np.array(
+        [
+            atom.get_coord() for atom in source_structure.get_atoms()
+        ]
+    )
+    structure_coord_pcd_full = PointCloud()
+    structure_coord_pcd_full.points = Vector3dVector(structure_coords_full)
+    structure_coord_pcd_full.transform(random_transformation)
+    structure_coord_pcd_full.transform(transformation)
+
+    io = PDBIO()
+    io.set_structure(structure_coords_full)
+    io.save(out_fn + ".pdb")
+
+    return (
+        rmsd,
+        clashing,
+        structure_coord_pcd,
+        structure_coord_pcd_notTransformed,
+    )  # , structure, structure_coord_pcd
+
+
+
 # Compute different types of scores:
 # -- Inverted sum of the minimum descriptor distances squared cutoff.
 def compute_desc_dist_score(
