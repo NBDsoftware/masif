@@ -43,12 +43,13 @@ global_ground_truth_time = 0.0
 nn_model = ScoreNN()
 print(sys.argv)
 
-if len(sys.argv) != 6 or (sys.argv[5] != "masif" and sys.argv[5] != "gif"):
+if len(sys.argv) != 7 or (sys.argv[5] != "masif" and sys.argv[5] != "gif"):
     print("Usage: {} data_dir K ransac_iter num_success gif|masif".format(sys.argv[0]))
     print("data_dir: Location of data directory.")
     print("K: Number of decoy descriptors per target")
     print("ransac_iter: number of ransac iterations.")
     print("num_success: true alignment within short list of size num_success")
+    print("list of pdbs")
     sys.exit(1)
 
 data_dir = sys.argv[1]
